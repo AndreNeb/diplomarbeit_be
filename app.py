@@ -1,16 +1,16 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, url_for
 
 app = Flask(__name__)
 
-# Startseite mit Button
+# Route für die Startseite
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
 
-# Route, die aufgerufen wird, wenn der Button geklickt wird
-@app.route('/button-click')
-def button_click():
-    return "Der Button wurde geklickt!"
+# Route, die aufgerufen wird, wenn der Button gedrückt wird
+@app.route('/button_clicked')
+def button_clicked():
+    return render_template('button_clicked.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
