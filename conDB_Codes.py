@@ -3,28 +3,26 @@ import mysql.connector
 from mysql.connector import Error
 
 # globals
-global con, cur
 tasks = ("all", "first", "last", "specific", "search")
 
 # create connection to database
-def conDatabase():
-    global con, cur
-    con = mysql.connector.connect(
-        host="152.89.239.166",
-        port="12345",
-        user="conDA-DB",
-        password="conDA-DB_2024-25",
-        database="DA_LsgKatalog_Stat"
-    )
-    cur = con.cursor()
-    # test connection
-    try:
-        if con.is_connected():
-            print("Connected")
-    except Error as e:
-        print("Error: " + str(e))
+con = mysql.connector.connect(
+    host="152.89.239.166",
+    port="12345",
+    user="conDA-DB",
+    password="conDA-DB_2024-25",
+    database="DA_LsgKatalog_Stat"
+)
+cur = con.cursor()
+# test connection
+try:
+    if con.is_connected():
+        print("Connected")
+except Error as e:
+    print("Error: " + str(e))
 
 def searchKap(task):
+    global con, cur
     if task == "all":
         query = "SELECT * FROM `Kapitel`"   # select all data from kapitel
         cur.execute(query)
@@ -52,8 +50,11 @@ def searchKap(task):
         query = "SELECT * FROM Kapitel WHERE kap_name LIKE %s"
         cur.execute(query, ('%' + terms + '%',))    # terms is bevor or after
         ans = cur.fetchall()
+        return ans
+        """
         for r in ans:
             print(r)
+        """
 
 def searchReg(task):
     if task == "all":   # get all items contained in table
@@ -87,3 +88,5 @@ def searchReg(task):
                 print(r)
 
 
+cur.close()
+con.close()
