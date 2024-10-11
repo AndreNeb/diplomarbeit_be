@@ -1,21 +1,9 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suchfunktion</title>  <!-- name of tab-->
-</head>
+<!doctype html>
+<title>Hello from Flask</title>
 <body>
-    <h1>Suche starten</h1>  <!-- name of tab -->
-    <form action="/search" method="POST">
-        <label for="task">Gib einen Suchbegriff oder Nummer ein:</label>
-        <input type="text" id="task" name="task" required>
-        <button type="submit">Suchen</button>
-    </form>
-
-    {% if result %}
-        <h2>Ergebnis:</h2>
-        <p>{{ result }}</p>
-    {% endif %}
+    {% if person %}
+  <h1>Hello {{ person }}!</h1>
+{% else %}
+  <h1>Hello, World!</h1>
+{% endif %}
 </body>
-</html>

@@ -1,8 +1,15 @@
-Flask for communication with html
-- render_template for using templates (xxx.html)
-- url_for not sure yet
+--- Flask ---
+@app.route("/<name>")               # tell Flask what URL should trigger our function; <name> gets value from URL
+                                    # name is everything after / ...
+def login(name):
+    return f"Hello, {escape(name)}!"
 
-app is the directory where all routes are managed
-- @app.route() --> define new "branch" of directory
-- the route has to start with / even when nothing comes afterwards
--
+--- URL-Erstellung ---
+url_for()
+with app.test_request_context():
+    print(url_for('index'))
+    print(url_for('login'))
+    print(url_for('login', next='/'))
+    print(url_for('profile', username='Viki'))
+
+--- Render Vorlage ---

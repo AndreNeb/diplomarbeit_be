@@ -1,19 +1,11 @@
-from flask import Flask, render_template, url_for, request
-import conDB_Codes as DB
-app = Flask(__name__)
+from flask import Flask, render_template, request    # WSGI application
 
-@app.route('/')
-def index():
-    return render_template('index.html', result=None)
+app = Flask(__name__)       # instance of class named; needed to look for resources
+@app.route('/') # homepage
+@app.route('/<name>') # run when name is entered in url
+def index(name=None):
+    return render_template('index.html', person=name)
 
-@app.route('/search', methods=['POST'])
-def search():
-    task = request.form['task']
-    result = DB.searchKap(task)
-    return render_template('index.html', result=result)
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
-print("Hello World")
+with app.test_request_context('/', method='POST'):
+    assert request.path == '/'
+    assert request.method == 'POST'
