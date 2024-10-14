@@ -6,7 +6,7 @@ patient --> id von uns = user
     normale Anmeldung
 
 ---------------------------------------------------
-use: https://flask.palletsprojects.com/en/3.0.x/tutorial
+connection to database through mysql.connector
 
 
 
