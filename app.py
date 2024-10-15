@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template, jsonify
 import pymysql
-import re
 
 app = Flask(__name__)
 # MariaDB connection details
@@ -13,15 +12,18 @@ db_config = {
 }
 
 def convert_to_sql_like_pattern(search_term):
-    search_term = search_term.strip()  # Entferne unnötige Leerzeichen
+    like_pattern = str()
+    search_term = search_term.strip()  # delete not necessary spaces before and after input; not in between
     if len(search_term) < 2:
         return None  # Wenn die Eingabe zu kurz ist, kann kein gültiges Muster erstellt werden
+    elif len(search_term) == 2:
+        first_letter = search_term[0]  # Der erste Buchstabe muss am Anfang stehen
+        second_letter = search_term[1]  # Der zweite Buchstabe kann irgendwo vorkommen
 
-    first_letter = search_term[0]  # Der erste Buchstabe muss am Anfang stehen
-    second_letter = search_term[1]  # Der zweite Buchstabe kann irgendwo vorkommen
-
-    # Muster: Der erste Buchstabe am Anfang, und der zweite irgendwo im Wort
-    like_pattern = f"{first_letter}%{second_letter}%"
+        # Muster: Der erste Buchstabe am Anfang, und der zweite irgendwo im Wort
+        like_pattern = f"{first_letter}%{second_letter}%"
+    else:
+        like_pattern = f"%{search_term}%"
     return like_pattern
 
 
@@ -36,10 +38,10 @@ def get_matching_codes(search_term):
                 return []  # Keine Übereinstimmungen, wenn das Muster ungültig ist
 
             # Verwende LIKE für die Suche nach dem genauen Muster
-            query = "SELECT code FROM codes_table WHERE code LIKE %s"
+            query = "SELECT * FROM Codes WHERE name_code LIKE %s"
             cursor.execute(query, (like_pattern,))
             result = cursor.fetchall()
-            return [row[1] for row in result]
+            return [row[2] for row in result]
     finally:
         connection.close()
 

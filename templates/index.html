@@ -11,15 +11,24 @@
     <form id="search-form">
         <label for="search_term">Suchbegriff eingeben:</label>
         <input type="text" id="search_term" name="search_term" autocomplete="off">
+
+        <!-- Dropdown-Menü, das die Suchergebnisse anzeigt -->
         <div>
-            <select id="results-dropdown">
+            <select id="results-dropdown" size="5">
                 <option value="">Ergebnisse werden hier angezeigt...</option>
             </select>
         </div>
+
+        <!-- Neues Textfeld, um den ausgewählten Wert aus dem Dropdown-Menü zu speichern -->
+        <label for="code_term">Gewählter Code:</label>
+        <input type="text" id="code_term" name="code_term" readonly>
+
+        <button type="submit">Code verwenden</button>
     </form>
 
     <script>
         $(document).ready(function() {
+            // Wenn der Benutzer in das Suchfeld eingibt
             $('#search_term').on('input', function() {
                 var searchTerm = $(this).val();
                 $.ajax({
@@ -28,7 +37,7 @@
                     data: { search_term: searchTerm },
                     success: function(response) {
                         var dropdown = $('#results-dropdown');
-                        dropdown.empty();  // Clear previous results
+                        dropdown.empty();  // Alte Ergebnisse löschen
 
                         if (response.length > 0) {
                             $.each(response, function(index, item) {
@@ -45,6 +54,12 @@
                         }
                     }
                 });
+            });
+
+            // Wenn der Benutzer einen Wert aus dem Dropdown-Menü auswählt
+            $('#results-dropdown').on('change', function() {
+                var selectedValue = $(this).val();  // Hole den ausgewählten Wert
+                $('#code_term').val(selectedValue);  // Setze den Wert in das Textfeld
             });
         });
     </script>
