@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, url_for, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # connection to database
-con = db.conDB_UserData()[0]
+con = db.conDB_UserData()
 cur = con.cursor()
 
 # creating new application in flask called app

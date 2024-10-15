@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code-Suche</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Code-Suche</h1>
+    <form id="search-form">
+        <label for="search_term">Suchbegriff eingeben:</label>
+        <input type="text" id="search_term" name="search_term" autocomplete="off">
+        <div>
+            <select id="results-dropdown">
+                <option value="">Ergebnisse werden hier angezeigt...</option>
+            </select>
+        </div>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            $('#search_term').on('input', function() {
+                var searchTerm = $(this).val();
+                $.ajax({
+                    type: 'POST',
+                    url: '/search',
+                    data: { search_term: searchTerm },
+                    success: function(response) {
+                        var dropdown = $('#results-dropdown');
+                        dropdown.empty();  // Clear previous results
+
+                        if (response.length > 0) {
+                            $.each(response, function(index, item) {
+                                dropdown.append($('<option>', {
+                                    value: item,
+                                    text: item
+                                }));
+                            });
+                        } else {
+                            dropdown.append($('<option>', {
+                                value: '',
+                                text: 'Keine Ergebnisse'
+                            }));
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

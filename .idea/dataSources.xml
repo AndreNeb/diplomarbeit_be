@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:mariadb://152.89.239.166:12345/DA_UserData</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="DA_LsgKatalog_Stat@152.89.239.166" uuid="73c4e6c5-9fd4-49e4-8bd4-a3c22531941e">
+      <driver-ref>mariadb</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mariadb://152.89.239.166:12345/DA_LsgKatalog_Stat</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
