@@ -1,5 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
+from flask_mysqldb import MySQL
 
 def conDB_UserData():
     con = mysql.connector.connect(
@@ -32,3 +33,10 @@ def conDB_Codes():
     except Error as e:
         print("Error: " + str(e))
     return con
+
+def conAutofill(app):
+    app.config['MYSQL_HOST'] = '152.89.239.166'
+    app.config['MYSQL_USER'] = 'DA_NeededCodes'
+    app.config['MYSQL_PASSWORD'] = 'DA_NeededCodes_2024-25'
+    app.config['MYSQL_DB'] = 'DA_NeededCodes'
+    return MySQL(app)
