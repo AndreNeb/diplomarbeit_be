@@ -2,6 +2,7 @@
 import conDatabase as db
 import mysql.connector
 from mysql.connector import Error
+from flask_mysqldb import MySQL
 from flask import Flask, render_template, request, url_for, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -11,6 +12,13 @@ cur = con.cursor()
 
 # creating new application in flask called app
 app = Flask(__name__)
+db_config = {
+    'host': '152.89.239.166',
+    'user': 'DA_NeededCodes',
+    'password': 'DA_NeededCodes_2024-25',
+    'database': 'DA_Needed_Codes',
+    'port': 12345
+}
 
 # home site
 @app.route("/")
