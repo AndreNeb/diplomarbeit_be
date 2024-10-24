@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html lang="de">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
     <style>
       h1 {
-        color: green;
+        color: #11557C;
       }
     </style>
   </head>
   <body>
-    <nav>
-      <ul>
-        <li><a href="/login">Login</a></li>
-        <li><a href="/register">Register</a></li>
-      </ul>
-    </nav>
+    <h1>Willkommen</h1>
+    <div class="nav-button">
+      <form action="/login" method="get">
+        <button type="submit">Login</button>
+      </form>
+      <form action="/register" method="get">
+        <button type="submit">Register</button>
+      </form>
+    </div>
   </body>
 </html>

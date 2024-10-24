@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login</title>
+  <title>Register</title>
   <style>
     h1 {
       color: #11557C;
@@ -11,16 +11,19 @@
   </style>
 </head>
 <body>
-    <h1>Login</h1>
-    <form action="/login" method="post">
-      <label for="username">Username / Email:</label>
+    <h1>Register</h1>
+    <form action="/register" method="post">
+      <label for="username">Username:</label>
       <input type="text" id="username" name="username" placeholder="Username" required />
+      <br>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" placeholder="Email" required />
       <br>
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" placeholder="Password" required />
       <br>
       <br>
-      <button type="submit">Login</button>
+      <button type="submit">Register</button>
     </form>
   </body>
 </html>

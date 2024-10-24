@@ -1,72 +1,71 @@
-# imports
+# --- imports --- #
 import bcrypt
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect, url_for, render_template, session as flask_session
 from flask_cors import CORS
 from sqlalchemy import create_engine, Integer, String, Column
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-# --- Database connection --- #
-host='152.89.239.166'
-port=12345
-user='conUserData'
-passwd='conUserData_2024-25'
-database='DA_UserData'
-
-# --- create new Class --- #
+# --- Create new class --- #
 app = Flask(__name__)
-CORS(app)   # enable CORS for all routes
+CORS(app)   # enables CORS for all routes to transfer token
+app.config['SECRET_KEY'] = 'DA_Narko-Register-Login'
 
-app.config['SECRET_KEY'] = 'DA-Narko'
+# --- Create connection to Database --- #
+host = '152.89.239.166'
+port = 12345
+user = 'conUserData'
+passwd = 'conUserData_2024-25'
+database = 'DA_UserData'
+engine = create_engine(f'mysql+pymysql://{user}:{passwd}@{host}:{port}/{database}')
 
-# --- Create engine --- # uses database connection configuration to connect to and communicate with underlying database
-engine = create_engine(f"mysql+pymysql://{user}:{passwd}@{host}:{port}/{database}")
-
-# --- Configurate Session --- #
-SessionFactory = sessionmaker(bind=engine)  # create session
-session = scoped_session(SessionFactory)    #
-
-# --- Base for the ORM-Modell --- # Object-Relational-Mapping
-Base = declarative_base()   # creates base class for declarative class definitions
+# --- Create Session --- #
+SessionFactory = sessionmaker(bind=engine)
+db_session = scoped_session(SessionFactory)
+Base = declarative_base()  # creates base class for declarative class definition
 Base.metadata.reflect(engine)
 
-# --- Define User-Modell --- #
+# --- Class User --- #
 class User(Base):
     __tablename__ = Base.metadata.tables['user_data']
-
-    # defining already existing columns / table for class User
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, nullable=False)
+    user = Column(String, nullable=False)
     password = Column(String, nullable=False)
+    email = Column(String, nullable=False)
 
-"""
-users = session.query(User).all()
-for i in users:
-    print(i.username, i.password)
-"""
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        data = request.get_json()
+        user_email = data['user']  # either username or email
+        password = data['password'].encode('utf-8')
 
-# Route creating account (user, password)
-@app.route('/register', methods=['POST'])
-def register():     # add user
-    data = request.get_json()   # analyse given JSON-data in Flask-Web-Applications from request body
+        query = db_session.query(User).filter((User.user == user_email) | (User.email == user_email)).first()
+        if query and bcrypt.checkpw(password, query.password.encode('utf-8')):
+            flask_session['user'] = query.user  # Store the username in session
+            return jsonify({'message': 'Login successful!'}), 200
+        else:
+            return jsonify({'message': 'Invalid credentials or password'}), 401
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    data = request.get_json()
     try:
-        passwd = data['password'].encode('utf-8')
-        passwd_hashed = bcrypt.hashpw(passwd, bcrypt.gensalt()).decode('utf-8')
-        # creating new user --> nuser
-        nuser = User(username=data['username'], password=passwd_hashed) # creating new user
-        session.add(nuser)  # add user
-        session.commit()    # commit user to database
-        return jsonify({'message': 'User successfully added!'}), 201    # 201 is http status code; indicates everything was successful
+        if request.method == 'POST':
+            user = data['user']
+            email = data['email']
+            passwd = data['password'].encode('utf-8')
+            # ---  Hash password --- #
+            pw_hashed = bcrypt.hashpw(passwd, bcrypt.gensalt()).decode('utf-8')
+            newUser = User(user=user, password=pw_hashed, email=email)
+            db_session.add(newUser)
+            db_session.commit()
+            return jsonify({'message': 'User registered successfully!'}), 201
     except Exception as e:
-        session.rollback()
-        print(f'Error: {str(e)}')
-        return jsonify({'message': 'An error ocurred while adding the user'}), 400
+        db_session.rollback()
+        return jsonify({'message': str(e)}), 400
     finally:
-        session.remove()    # deleting session in the end
+        db_session.remove()  # deleting session in the end
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-

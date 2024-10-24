@@ -1,57 +1,68 @@
 # imports
-import conDatabase as db
-import mysql.connector
-from mysql.connector import Error
-from flask_mysqldb import MySQL
-from flask import Flask, render_template, request, url_for, redirect
-from werkzeug.security import generate_password_hash, check_password_hash
+import bcrypt
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from sqlalchemy import create_engine, Integer, String, Column
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, scoped_session
 
-# connection to database
-con = db.conDB_UserData()
-cur = con.cursor()
+# --- Database connection --- #
+host='152.89.239.166'
+port=12345
+user='conUserData'
+passwd='conUserData_2024-25'
+database='DA_UserData'
 
-# creating new application in flask called app
+# --- create new Class --- #
 app = Flask(__name__)
-db_config = {
-    'host': '152.89.239.166',
-    'user': 'DA_NeededCodes',
-    'password': 'DA_NeededCodes_2024-25',
-    'database': 'DA_Needed_Codes',
-    'port': 12345
-}
+CORS(app)   # enable CORS for all routes
 
-# home site
-@app.route("/")
-def home():
-    return render_template("home.html")
+app.config['SECRET_KEY'] = 'DA-Narko'
 
-@app.route("/login", methods=['GET','POST'])
-def login():
-    if request.method == "POST":
-        try:
-            entered_username = request.form.get("username")
-            entered_password = request.form.get("password")
-            query = "SELECT username, password FROM user_data WHERE username = %s"
-            cur.execute(query, entered_username)
-            ans = cur.fetchall()    # ['username', 'password']
-            user = str(ans[0])
-            password = check_password_hash(str(ans[1]), entered_password)
-            print(print)
-        except Error as e:
-            print("No username found!")  # ['id', 'username', 'password']
-        return redirect(url_for("home"))
-    return render_template("login.html")
+# --- Create engine --- # uses database connection configuration to connect to and communicate with underlying database
+engine = create_engine(f"mysql+pymysql://{user}:{passwd}@{host}:{port}/{database}")
 
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    global con
-    if request.method == "POST":
-        hashed_password = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256')
-        username = request.form.get("username")
-        query = "INSERT INTO user_data(username, password) VALUES (%s, %s)"
-        cur.execute(query, (username, hashed_password))
-        con.commit()
-    return render_template("sign_up.html")
+# --- Configurate Session --- #
+SessionFactory = sessionmaker(bind=engine)  # create db_session
+session = scoped_session(SessionFactory)    #
 
-if __name__ == "__main__":
-    app.run()
+# --- Base for the ORM-Modell --- # Object-Relational-Mapping
+Base = declarative_base()   # creates base class for declarative class definitions
+Base.metadata.reflect(engine)
+
+# --- Define User-Modell --- #
+class User(Base):
+    __tablename__ = Base.metadata.tables['user_data']
+
+    # defining already existing columns / table for class User
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String, nullable=False)
+    password = Column(String, nullable=False)
+
+"""
+users = db_session.query(User).all()
+for i in users:
+    print(i.username, i.password)
+"""
+
+# Route creating account (user, password)
+@app.route('/register', methods=['POST'])
+def register():     # add user
+    data = request.get_json()   # analyse given JSON-data in Flask-Web-Applications from request body
+    try:
+        passwd = data['password'].encode('utf-8')
+        passwd_hashed = bcrypt.hashpw(passwd, bcrypt.gensalt()).decode('utf-8')
+        # creating new user --> nuser
+        nuser = User(username=data['username'], password=passwd_hashed) # creating new user
+        session.add(nuser)  # add user
+        session.commit()    # commit user to database
+        return jsonify({'message': 'User successfully added!'}), 201    # 201 is http status code; indicates everything was successful
+    except Exception as e:
+        session.rollback()
+        print(f'Error: {str(e)}')
+        return jsonify({'message': 'An error ocurred while adding the user'}), 400
+    finally:
+        session.remove()    # deleting db_session in the end
+
+if __name__ == '__main__':
+    app.run(debug=True)
